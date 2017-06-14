@@ -40,31 +40,35 @@ def fileToDframe(file, footer, cols, sheet):
     return df
 
 
-def plotDframe(dframe, y_list, sec_y, graph_type):
+def plotDframe(dframe, y_list, sec_y, graph_type, title, **ylabel):
 
 
-    graph_types = ['.','-','.--']
-
-    if graph_type == 'point':
-        a = graph_types[0]
-
-    # if graph_type == 'line':
-    #     a = graph_types[1]
-    #
-    # if graph_type == 'dotted line':
-    #     a = graph_types[2]
-    #
-    # else:
-    #     raise ValueError("Invalid graph type")
+    fig, ax = plt.subplots()
+    colors = ['blue','purple','green','red']
 
     for i in y_list:
+        ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[len(y_list)-1])
 
-        plt.plot(dframe['Date'], dframe[i], a)
+
+        if len(y_list) == 1:
+            ax.set_ylabel(str(i))
+        else:
+            ax.set_ylabel(ylabel)
+
+        
+
 
     if sec_y:
 
-        plt.plot(dframe['Date'], dframe[sec_y], a)
+        ax2 = ax.twinx()
+        ax2.plot(dframe['Date'], dframe[sec_y], graph_type, color='orange')
+        ax2.set_ylabel(str(sec_y))
+        ax2.legend(str(sec_y))
 
+
+    ax.set_xlabel('Time')
+
+    plt.title(title)
     plt.show()
 
 
@@ -104,8 +108,9 @@ df_flow=fileToDframe(filename, flow_footer, flow_cols,sheetn)
 yl = df_clim.columns.values.tolist()
 yl2 = df_flow.columns.values.tolist()
 
+graph_types = ['.','-','.--']
 
-plotDframe(df_clim,['Precipitation'],'Temperature','point')
+plotDframe(df_clim,['Precipitation'],'Temperature',graph_types[0], "Climate Data")
 #print yl2[1:-1]
 
 #df_clim.plot(x_ax, secondary_y='Temperature',kind='.', mark_right=False)
