@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 import seaborn as sns
 
 
@@ -42,12 +43,16 @@ def fileToDframe(file, footer, cols, sheet):
 
 def plotDframe(dframe, y_list, sec_y, graph_type, title, **ylabel):
 
+    fontP = FontProperties()
+    fontP.set_size('small')
 
     fig, ax = plt.subplots()
     colors = ['blue','purple','green','red']
 
+    ax.set_xlabel('Date')
+
     for i in y_list:
-        ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[len(y_list)-1])
+        pplot, = ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[len(y_list)-1])
 
 
         if len(y_list) == 1:
@@ -55,27 +60,19 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, **ylabel):
         else:
             ax.set_ylabel(ylabel)
 
-        
-
-
     if sec_y:
 
         ax2 = ax.twinx()
-        ax2.plot(dframe['Date'], dframe[sec_y], graph_type, color='orange')
+        splot, = ax2.plot(dframe['Date'], dframe[sec_y], graph_type, color='orange')
         ax2.set_ylabel(str(sec_y))
-        ax2.legend(str(sec_y))
 
+    handles=[pplot,splot]
+    labels=[pplot.get_label(),splot.get_label()]
 
-    ax.set_xlabel('Time')
+    plt.legend(handles,labels,loc='upper right')
 
     plt.title(title)
     plt.show()
-
-
-   # ax = plt.plot(dframe[x], dframe[y], '.--')
-
-   # ax2 = ax.twinx()
-   # ax2 = plt.plot(dframe[])
 
 
 
