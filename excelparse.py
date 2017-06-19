@@ -126,9 +126,7 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, ylabel):
     ax.legend(handles, labels, bbox_to_anchor=(1.1,1.15), ncol=2)
 
     # Set title
-
     plt.title(title)
-
 
     return ax
 
