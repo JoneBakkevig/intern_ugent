@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.font_manager import FontProperties
 
 __author__ = 'j.k.bakkevig@gmail.com'
 
@@ -49,7 +50,7 @@ def fileToDframe(file, footer, cols, sheet):
     return df
 
 
-def plotDframe(dframe, y_list, sec_y, graph_type, title, **ylabel):
+def plotDframe(dframe, y_list, sec_y, graph_type, title, ylabel):
 
     """
     =====================
@@ -80,20 +81,31 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, **ylabel):
     fig, ax = plt.subplots()
 
     # Plotting colors, only 4 stated as not expecting more than 4 plots on one y-axis
-    colors = ['blue','purple','green','red']
+    colors = ['blue','red','green','purple']
 
     # Setting x-axis to date as no other x-axis is expected in this project #TODO: This may change, make generic solution for adjustable x-axis
     ax.set_xlabel('Date')
 
     # Iterate over column names to plot on first y-axis
-    for i in y_list:
-        pplot, = ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[len(y_list)-1])
-        # If only one item in y_list, use its column name as y-label
-        if len(y_list) == 1:
+
+    line2d = []
+    j = 0
+
+    if len(y_list) == 1:
+        for i in y_list:
+            pplot, = ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[len(y_list) - 1])
             ax.set_ylabel(str(i))
-        # If multiple items in y_list, use optional parameter ylabel to set specific y-label
-        elif len(y_list)>1:
-            ax.set_ylabel(ylabel)
+
+
+    # If multiple items in y_list, use optional parameter ylabel to set specific y-label
+
+    elif len(y_list) > 1:
+        for i in y_list:
+            pplot, = ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[j])
+            line2d.append(pplot)
+            j += 1
+
+        ax.set_ylabel(ylabel)
 
     # If any item, plot it on second y-axis
     if sec_y:
@@ -104,16 +116,24 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, **ylabel):
         # Set title to column name, as its only one value plotted
         ax2.set_ylabel(str(sec_y))
 
-    # Create handles for legend
-    handles=[pplot,splot]
-    # Create labels for legend
-    labels=[pplot.get_label(),splot.get_label()]
-    # Create legend
-    plt.legend(handles,labels,loc='upper right')
+    # Create handles and labels for legend
+    handles, labels = ax.get_legend_handles_labels()
+    # Appending second y axis handle and label
+    handles.append(splot)
+    labels.append(splot)
+
+    fontP = FontProperties()
+    fontP.set_size('small')
+
+    ax.legend(handles, labels, bbox_to_anchor=(1.1,1.15), ncol=2, fancybox=True)
+
     # Set title
+
     plt.title(title)
-    # Show figure
+
+
     plt.show()
+
 
     return ax, ax2
 
@@ -125,26 +145,6 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, **ylabel):
 #__SHEET_3_LEGEND__
 # 0=Date, 4=TSS, 23=SRT, 25=HRT
 #
-climate_cols = [0, 3, 66]
-flow_cols = [0, 6, 79]
-
-climate_footer=110 #TODO: calculate footer on shortest coloumn
-flow_footer=91
-
-filename='Data_nieuwveer.xlsx'
-size=(10,8)
-sheetn=1
-x_ax='Date'
-
-sns.plotting_context(font_scale=0.5)
-sns.set_style("dark")
-
-df_clim=fileToDframe(filename, climate_footer, climate_cols,sheetn)
-df_flow=fileToDframe(filename, flow_footer, flow_cols,sheetn)
-
-graph_types = ['.','-','.--']
-
-plotDframe(df_clim,['Precipitation'],'Temperature',graph_types[0], "Climate Data")
 
 
 
