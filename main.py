@@ -41,4 +41,6 @@ df_flow=ftdf(filename, flow_footer, flow_cols,sheetn)
 
 
 #pdfr(df_clim,['Precipitation'],'Temperature',graph_types[0], "Climate Data", None)
-pdfr(df_flow, ['Qinf_total','Qinf','Q_effluent'], 'Fe_doseA',graph_types[0], "Flow Rate Data", "Flow")
+#pdfr(df_flow, ['Qinf_total','Qinf','Q_effluent'], 'Fe_doseA',graph_types[0], "Flow Rate Data", "Flow")
+
+pdfr(df_flow, ['Qinf'], 'Fe_doseA', graph_types[0], "Flow Rate Data", None)

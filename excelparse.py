@@ -43,8 +43,8 @@ def fileToDframe(file, footer, cols, sheet):
     df=dt.parse(sheetname=(sheet-1), skiprows=7, skip_footer=footer, dtype=datatype, parse_cols=cols)
 
     # If no values in the cell, interpolate. Used for line plotting
-    if df.isnull().values.any() == True:
-        df=df.interpolate(method='index')
+    #if df.isnull().values.any() == True:
+        #df=df.interpolate(method='index')
 
     # Function returns object(s) DataFrame, for use in seperate plotting function
     return df
@@ -107,6 +107,9 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, ylabel):
 
         ax.set_ylabel(ylabel)
 
+    # Create handles and labels for legend
+    handles, labels = ax.get_legend_handles_labels()
+
     # If any item, plot it on second y-axis
     if sec_y:
         # Share x-axis with ax
@@ -114,28 +117,20 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, ylabel):
         # Plot the column of sec_y on y-axis
         splot, = ax2.plot(dframe['Date'], dframe[sec_y], graph_type, color='orange')
         # Set title to column name, as its only one value plotted
-        ax2.set_ylabel(str(sec_y))
+        ax2.set_ylabel(sec_y)
+        # Appending second y axis handle and label
+        handles.append(splot)
+        labels.append(splot.get_label())
 
-    # Create handles and labels for legend
-    handles, labels = ax.get_legend_handles_labels()
-    # Appending second y axis handle and label
-    handles.append(splot)
-    labels.append(splot)
 
-    fontP = FontProperties()
-    fontP.set_size('small')
-
-    ax.legend(handles, labels, bbox_to_anchor=(1.1,1.15), ncol=2, fancybox=True)
+    ax.legend(handles, labels, bbox_to_anchor=(1.1,1.15), ncol=2)
 
     # Set title
 
     plt.title(title)
 
 
-    plt.show()
-
-
-    return ax, ax2
+    return ax
 
 #__SHEET_1_LEGEND__
 #
