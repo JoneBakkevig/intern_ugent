@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as tck
 import seaborn as sns
 from matplotlib.font_manager import FontProperties
 
@@ -42,15 +43,11 @@ def fileToDframe(file, footer, cols, sheet):
     # Parses zero indexed sheet with relevant cols into DataFrame, 7 rows are skipped as per excel document structure
     df=dt.parse(sheetname=(sheet-1), skiprows=7, skip_footer=footer, dtype=datatype, parse_cols=cols)
 
-    # If no values in the cell, interpolate. Used for line plotting
-    #if df.isnull().values.any() == True:
-        #df=df.interpolate(method='index')
-
     # Function returns object(s) DataFrame, for use in seperate plotting function
     return df
 
 
-def plotDframe(dframe, y_list, sec_y, graph_type, title, ylabel):
+def plotDframe(dframe, y_list, graph_type, title, size, y1label=None, style=None, sec_y=None, y2label=None,):
 
     """
     =====================
@@ -65,70 +62,87 @@ def plotDframe(dframe, y_list, sec_y, graph_type, title, ylabel):
     :param sec_y: Column name to plot on second y-axis
     :param graph_type: What type of plot, graph type are denoted by strings '.', '-', etc
     :param title: Title of the Plot
-    :param ylabel: Optional parameter, if several elements in y_list, use this parameter to label the first y-axis appropriately
+    :param size: Size of the figure
+    :param y1label: Optional parameter, set maual label for first y axis
+    :param y2label: Optional parameter, set manual label for second y axis
+    :param style: scientific or plain style, 'sci' for scientific, 'plain' is default
 
-    :return ax, ax2: Axes objects ax, ax2 for further use to change tick rates etc
+    :return ax, fig: Axes object ax and figure fig for further use in ipython notebook
 
     Example:
 
     plotDframe(dframe, ['Precipitation'], 'Temperature, '.', "Climate Data")
 
-    returns plot of column Precipitation on first y-axis, column Temperature on second y-axis and 'Date' on x-axis.
+    returns plot of column Precipitation on first y-axis, column Temperature on second y-axis and by default, 'Date' on x-axis.
 
     """
 
     # Creating subplots for axis control
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=size)
 
     # Plotting colors, only 4 stated as not expecting more than 4 plots on one y-axis
     colors = ['blue','red','green','purple']
 
-    # Setting x-axis to date as no other x-axis is expected in this project #TODO: This may change, make generic solution for adjustable x-axis
+    # Setting x-axis to date as no other x-axis is expected in this project
     ax.set_xlabel('Date')
 
     # Iterate over column names to plot on first y-axis
-
-    line2d = []
     j = 0
+    labels = ''
 
     if len(y_list) == 1:
         for i in y_list:
             pplot, = ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[len(y_list) - 1])
+        if y1label != None:
+            ax.set_ylabel(str(i)+', '+y1label)
+        else:
             ax.set_ylabel(str(i))
-
 
     # If multiple items in y_list, use optional parameter ylabel to set specific y-label
 
     elif len(y_list) > 1:
         for i in y_list:
             pplot, = ax.plot(dframe['Date'], dframe[i], graph_type, color=colors[j])
-            line2d.append(pplot)
             j += 1
-
-        ax.set_ylabel(ylabel)
+            labels+=str(i)+', '
+        if y1label != None:
+            ax.set_ylabel(labels+y1label)
+        else:
+            ax.set_ylabel(labels)
 
     # Create handles and labels for legend
     handles, labels = ax.get_legend_handles_labels()
 
     # If any item, plot it on second y-axis
-    if sec_y:
+    if sec_y != None:
         # Share x-axis with ax
         ax2 = ax.twinx()
         # Plot the column of sec_y on y-axis
         splot, = ax2.plot(dframe['Date'], dframe[sec_y], graph_type, color='orange')
         # Set title to column name, as its only one value plotted
-        ax2.set_ylabel(sec_y)
+        if y2label != None:
+            ax2.set_ylabel(sec_y+', '+y1label)
+        else:
+            ax2.set_ylabel(sec_y)
         # Appending second y axis handle and label
         handles.append(splot)
         labels.append(splot.get_label())
 
-
-    ax.legend(handles, labels, bbox_to_anchor=(1.1,1.15), ncol=2)
-
     # Set title
     plt.title(title)
 
-    return ax
+    # Set style
+    if style != None:
+        ax.ticklabel_format(style=style, axis='y', scilimits=(0,0))
+        ax.yaxis.major.formatter._useMathText = True
+
+    # Add legend
+    lgd = ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=2)
+    fig.savefig('figure', bbox_extra_artists=(lgd,), bbox_inches='tight', pad_inches=1)
+
+    plt.show()
+
+    return ax, fig
 
 #__SHEET_1_LEGEND__
 #

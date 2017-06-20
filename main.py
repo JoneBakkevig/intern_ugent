@@ -34,7 +34,7 @@ sheetn=1
 graph_types = ['.','-','.--']
 
 sns.plotting_context(font_scale=0.5)
-sns.set_style("dark")
+sns.set_style("white")
 
 #df_clim=ftdf(filename, climate_footer, climate_cols,sheetn)
 df_flow=ftdf(filename, flow_footer, flow_cols,sheetn)
@@ -43,4 +43,4 @@ df_flow=ftdf(filename, flow_footer, flow_cols,sheetn)
 #pdfr(df_clim,['Precipitation'],'Temperature',graph_types[0], "Climate Data", None)
 #pdfr(df_flow, ['Qinf_total','Qinf','Q_effluent'], 'Fe_doseA',graph_types[0], "Flow Rate Data", "Flow")
 
-pdfr(df_flow, ['Qinf'], 'Fe_doseA', graph_types[0], "Flow Rate Data", None)
+pdfr(df_flow, ['Qinf', 'Qinf_total'], graph_types[0], "Flow Rate Data", (16,8), 'm3', 'Fe_doseA', 'm3', 'sci')
