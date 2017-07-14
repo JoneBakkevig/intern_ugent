@@ -4,14 +4,15 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA as sklearnPCA
 import sklearn.preprocessing as skp
 from excelparse import fileToDframe
-
+import os
 
 columns = [3, 4, 7, 15, 35, 36, 43, 66, 79]
 columns_ = [3, 23, 25]
 
+filename = os.path.abspath('../Data_nieuwveer.xlsx')
 
-df1 = fileToDframe('Data_nieuwveer.xlsx', 92, columns, 1)
-df2 = fileToDframe('Data_nieuwveer.xlsx', 2, columns_, 3)
+df1 = fileToDframe(filename, 92, columns, 1)
+df2 = fileToDframe(filename, 2, columns_, 3)
 
 
 # Concatenating the frames from the separately parsed sheets
@@ -60,28 +61,35 @@ X_1 = pca2.transform(n_scaled)
 pca3 = doPca(n_scaled, 3)
 X_2 = pca3.transform(n_scaled)
 
-# ax1 = plt.scatter(X_1[:, 0], X_1[:, 1], c=target)
-# plt.colorbar(ax1)
-# plt.xlabel('PC1')
-# plt.ylabel('PC2')
-# plt.show()
-#
-# ax2 = plt.scatter(X_2[:, 1], X_2[:, 2], c=target)
-# plt.colorbar(ax2)
-# plt.xlabel('PC2')
-# plt.ylabel('PC3')
-# plt.show()
-#
-# ax3 = plt.scatter(X_2[:, 0], X_2[:, 2], c=target)
-# plt.colorbar(ax3)
-# plt.xlabel('PC1')
-# plt.ylabel('PC3')
-# plt.show()
+ax1 = plt.scatter(X_1[:, 0], X_1[:, 1], c=target)
+plt.colorbar(ax1)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
+plt.show()
 
-# plt.bar(np.arange(1, len(pca2.components_)+1, 0.1), pca2.components_[0])
-# plt.bar
-# plt.show()
-print pca2.components_
+ax2 = plt.scatter(X_2[:, 1], X_2[:, 2], c=target)
+plt.colorbar(ax2)
+plt.xlabel('PC2')
+plt.ylabel('PC3')
+plt.show()
+
+ax3 = plt.scatter(X_2[:, 0], X_2[:, 2], c=target)
+plt.colorbar(ax3)
+plt.xlabel('PC1')
+plt.ylabel('PC3')
+plt.show()
+
+
+cov = np.cov(n_scaled.T)
+
+eigval, eigvec = np.linalg.eig(cov)
+
+# Plotting weights
+plt.hist(pca2.components_[0])
+plt.hist(np.dot(np.array(n_scaled.T).transpose(),np.array(eigvec[:,1])))
+plt.show()
+
+
 
 
 
